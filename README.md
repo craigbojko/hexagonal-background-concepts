@@ -2,6 +2,14 @@
 
 A collection of interactive hexagonal background animations and patterns built with HTML, CSS, and JavaScript. This project demonstrates various approaches to creating dynamic hexagonal grid layouts for web backgrounds.
 
+## 🌐 Live Demo
+
+Visit the live demo: [https://craigbojko.github.io/hexagonal-background-concepts/](https://craigbojko.github.io/hexagonal-background-concepts/)
+
+- [Main Demo](https://craigbojko.github.io/hexagonal-background-concepts/) - CSS-based hexagonal grid
+- [Demo 2](https://craigbojko.github.io/hexagonal-background-concepts/index-2.html) - Rounded corners variant  
+- [Demo 3](https://craigbojko.github.io/hexagonal-background-concepts/index-3.html) - Dynamic JavaScript version
+
 ## Overview
 
 This project explores different hexagonal background concepts through multiple implementations:
@@ -81,13 +89,16 @@ npm run preview
 
 ```
 hexagonal-background-concept/
-├── index.html          # Main hexagonal grid with CSS masking
-├── index-2.html        # Alternative hexagonal layout
-├── index-3.html        # Dynamic JavaScript-generated hexagons
-├── package.json        # Project dependencies and scripts
-├── vite.config.ts      # Vite configuration
-├── tsconfig.json       # TypeScript configuration
-└── README.md           # Project documentation
+├── .github/
+│   └── workflows/
+│       └── deploy.yml      # GitHub Pages deployment workflow
+├── index.html              # Main hexagonal grid with CSS masking
+├── index-2.html            # Alternative hexagonal layout
+├── index-3.html            # Dynamic JavaScript-generated hexagons
+├── package.json            # Project dependencies and scripts
+├── vite.config.ts          # Vite configuration with GitHub Pages support
+├── tsconfig.json           # TypeScript configuration
+└── README.md               # Project documentation
 ```
 
 ## CSS Custom Properties
@@ -126,6 +137,26 @@ The hexagonal grids use CSS custom properties for easy customization:
 - Modern browsers with CSS Grid support
 - ES6+ JavaScript features
 - CSS Custom Properties support
+
+## Deployment
+
+This project is automatically deployed to GitHub Pages using GitHub Actions. The deployment workflow:
+
+1. Triggers on pushes to the `main` branch
+2. Installs dependencies using pnpm
+3. Builds the project with Vite
+4. Deploys the `dist` folder to GitHub Pages
+
+### Manual Deployment
+
+To deploy manually:
+
+```bash
+# Build the project
+pnpm build
+
+# The dist folder contains the built files ready for deployment
+```
 
 ## Contributing
 
