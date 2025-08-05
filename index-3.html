@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hexagon Pulse Background Demo</title>
+  </head>
+  <body>
+    <div class="hex-grid" id="hexGrid"></div>
+    <div class="overlay" id="overlay"></div>
+    <div class="blocker" id="blocker"></div>
+
+    <script>
+      // Calculate rows and columns based on viewport and hexagon size
+      const hexWidth = 100;
+      const hexHeight = hexWidth * 0.866;
+      const hexMargin = (hexWidth / 100) * 32;
+      
+      // Calculate effective spacing
+      const hexHorizontalSpacing = hexWidth * 1.65;
+      const hexVerticalSpacing = hexHeight * 4.8;
+      
+      // Calculate number of columns and rows needed to fill viewport
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight / 2;
+      
+      // Add extra columns/rows to ensure full coverage even with centering
+      const cols = Math.ceil(viewportWidth / (hexWidth * 0.5));
+      const rows = Math.ceil(viewportHeight / (hexHeight * 0.5));
+      
+      document.documentElement.style.setProperty('--hex-width', hexWidth + 'px');
+
+      console.log(`Calculated grid: ${cols} cols × ${rows} rows for viewport ${viewportWidth}×${viewportHeight}`);
+      
+      const grid = document.getElementById('hexGrid')
+      const hexPositions = []
+
+      function buildHexGrid() {
+        buildHexGridWithDimensions(rows, cols);
+      }
+
+      buildHexGrid()
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        // Clear existing grid
+        grid.innerHTML = '';
+        
+        // Recalculate dimensions
+        const newViewportWidth = window.innerWidth;
+        const newViewportHeight = window.innerHeight;
+        const newCols = Math.ceil(newViewportWidth / (hexWidth * 0.5));
+        const newRows = Math.ceil(newViewportHeight / (hexHeight * 0.5));
+        
+        // Update global variables
+        window.cols = newCols;
+        window.rows = newRows;
+        
+        console.log(`Resized grid: ${newCols} cols × ${newRows} rows for viewport ${newViewportWidth}×${newViewportHeight}`);
+        
+        // Rebuild grid with new dimensions
+        buildHexGridWithDimensions(newRows, newCols);
+      });
+
+      function buildHexGridWithDimensions(rowCount, colCount) {
+        for (let r = 0; r < rowCount; r++) {
+          const row = document.createElement('div')
+          row.classList.add('row')
+          if (r % 2 !== 0) {
+            row.classList.add('offset')
+          }
+          for (let c = 0; c < colCount; c++) {
+            const hex = document.createElement('div')
+            hex.classList.add('hex')
+            hex.setAttribute('data-row', r)
+            hex.setAttribute('data-col', c)
+            row.appendChild(hex)
+          }
+          grid.appendChild(row)
+        }
+      }
+
+      // Create pulse element
+      const pulse = document.createElement('div')
+      pulse.classList.add('pulse-line')
+      document.body.appendChild(pulse)
+
+      // Start animations immediately
+      setTimeout(() => {
+        pulse.classList.add('animate')
+        startHexagonWaveDiagonal()
+        startHexagonWaveHorizontal()
+      }, 100)
+
+      function startHexagonWaveDiagonal() {
+        const hexElements = document.querySelectorAll('.hex')
+        const animationDuration = 12000 // 12 seconds to match pulse
+        const animationDelay = 5000 // 2 seconds delay before starting
+
+        function animateHexagons() {
+          hexElements.forEach((hex, index) => {
+            const rect = hex.getBoundingClientRect()
+            const hexCenterX = rect.left + rect.width / 2
+            const hexCenterY = rect.top + rect.height / 2
+
+            // Calculate diagonal position (0 = top-left, 1 = bottom-right)
+            const viewportWidth = window.innerWidth
+            const viewportHeight = window.innerHeight
+            const diagonalPosition =
+              (hexCenterX + hexCenterY) / (viewportWidth + viewportHeight)
+
+            // Calculate delay based on diagonal position
+            const delay = diagonalPosition * animationDuration * 0.15 // 0.8 to account for pulse gradient position
+
+            setTimeout(() => {
+              hex.classList.add('wave-scale')
+              setTimeout(() => {
+                hex.classList.remove('wave-scale')
+              }, 300)
+            }, delay)
+          })
+
+          // Repeat the animation
+          setTimeout(animateHexagons, animationDuration)
+        }
+        
+        // Let's a go!!!
+        setTimeout(animateHexagons, animationDelay)
+      }
+
+      function startHexagonWaveHorizontal() {
+        const hexElements = document.querySelectorAll('.hex')
+        const animationDuration = 6000 // 6 seconds for horizontal wave
+        const viewportHeight = window.innerHeight
+
+        function animateHorizontalWave() {
+          // Randomly select 3-5 columns to be "fast" lanes
+          const numFastColumns = Math.floor(Math.random() * 3) + 3 // 3-5 columns
+          const fastColumns = new Set()
+
+          while (fastColumns.size < numFastColumns) {
+            fastColumns.add(Math.floor(Math.random() * (window.cols || cols)))
+          }
+
+          hexElements.forEach((hex, index) => {
+            const rect = hex.getBoundingClientRect()
+            const hexCenterY = rect.top + rect.height / 2
+            const hexCol = parseInt(hex.getAttribute('data-col'))
+
+            // Calculate vertical position (0 = top, 1 = bottom)
+            const verticalPosition = hexCenterY / viewportHeight
+
+            // Determine speed multiplier based on column
+            let speedMultiplier
+            if (fastColumns.has(hexCol)) {
+              // Fast columns: 1.5x to 2.5x speed
+              speedMultiplier = 1.5 + Math.random() * 1.0
+            } else {
+              // Normal columns: 0.6x to 1.2x speed
+              speedMultiplier = 0.6 + Math.random() * 0.6
+            }
+
+            // Calculate delay based on vertical position and speed
+            const baseDelay = verticalPosition * animationDuration * 0.9
+            const delay = baseDelay / speedMultiplier
+
+            setTimeout(() => {
+              hex.classList.add('wave-horizontal')
+              setTimeout(() => {
+                hex.classList.remove('wave-horizontal')
+              }, 800) // Animation duration
+            }, delay)
+          })
+
+          // Repeat the animation with offset timing
+          setTimeout(animateHorizontalWave, animationDuration + 3000) // 3 second gap between waves
+        }
+
+        // Start with a 2 second delay to offset from diagonal wave
+        setTimeout(animateHorizontalWave, 2000)
+      }
+    </script>
+
+    <style>
+      :root {
+        /* Basic sizing for each hexagon */
+        --hex-width: 100px default;
+        --hex-height: calc(var(--hex-width) * 0.866);
+        --hex-margin: calc((var(--hex-width) / 100) * 32);
+
+        /* Proper hexagon spacing calculations */
+        --hex-horizontal-spacing: calc(var(--hex-width) * 1.65);
+        --hex-vertical-spacing: calc(var(--hex-height) * 4.8);
+
+        --pulse-duration: 12000ms;
+
+        --accent-color: orange;
+      }
+
+      body {
+        background: #1e1e1e;
+        display: flex;
+        align-items: start;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .hex-grid {
+        position: relative;
+        pointer-events: none;
+        margin-top: calc(var(--hex-height) * -1);
+      }
+
+      .pulse-line {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 200%;
+        pointer-events: none;
+        z-index: -100;
+        background: radial-gradient(
+          ellipse 100% 100% at 0% 0%,
+          transparent 0%,
+          transparent 35%,
+          rgba(from var(--accent-color) r g b / 0.3) 40%,
+          rgba(from var(--accent-color) r g b / 0.8) 45%,
+          rgba(from var(--accent-color) r g b / 1) 48%,
+          rgba(from var(--accent-color) 255 255 255 / 1) 50%,
+          rgba(from var(--accent-color) r g b / 1) 52%,
+          rgba(from var(--accent-color) r g b / 0.8) 55%,
+          rgba(from var(--accent-color) r g b / 0.3) 60%,
+          transparent 70%,
+          transparent 100%
+        );
+        transform: translate(-50%, -50%);
+        mix-blend-mode: screen;
+      }
+
+      .pulse-line.animate {
+        animation: diagonalSweep var(--pulse-duration) linear infinite;
+      }
+
+      @keyframes diagonalSweep {
+        0% {
+          transform: translate(-200%, -200%);
+        }
+        100% {
+          transform: translate(200%, 200%);
+        }
+      }
+
+      .row {
+        display: flex;
+        margin-bottom: calc(var(--hex-vertical-spacing) * -0.25);
+        /* negative margin pulls the rows up to interlock vertically */
+      }
+
+      .row.offset {
+        /* offset odd rows to stagger the hexes */
+        margin-left: calc(var(--hex-horizontal-spacing) / 2);
+      }
+
+      .hex {
+        position: relative;
+        width: var(--hex-width);
+        height: var(--hex-height);
+        margin: var(--hex-margin);
+        background: #3d3d3d;
+        /* draw a hexagon using clip-path [oai_citation:1‡gist.github.com](https://gist.github.com/gunnarbittersmann/791f20a828c15bec0926#:~:text=%2A%20hexagon%20clip) */
+        clip-path: polygon(
+          25% 0%,
+          75% 0%,
+          100% 50%,
+          75% 100%,
+          25% 100%,
+          0% 50%
+        );
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .hex::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0px;
+        height: 0px;
+        box-sizing: border-box;
+
+        border: solid 64px var(--accent-color);
+        border-radius: 50%;
+        transform: scale(1) translate(-50%, -50%);
+        transform-origin: top left;
+
+        opacity: 0.5;
+        box-shadow: 0px 0px 40px 50px white,
+          -20px 20px 30px 70px var(--accent-color);
+      }
+
+      .hex.wave-scale {
+        transform: scale(0.8);
+        transition: transform 0.4s ease-in-out;
+      }
+
+      .hex.wave-horizontal {
+        animation: horizontalWaveScale 800ms ease-in-out;
+      }
+
+      @keyframes horizontalWaveScale {
+        0% {
+          transform: scale(1);
+        }
+        25% {
+          transform: scale(1.1);
+        }
+        75% {
+          transform: scale(0.8);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* subtle shading on each hexagon */
+      /* .hex::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image:
+        linear-gradient(135deg,
+          rgba(255,255,255,0.4) 0%,
+          rgba(255,255,255,0.4) 20%,
+          rgba(255,255,255,0) 20%,
+          rgba(255,255,255,0) 100%),
+        linear-gradient(45deg,
+          rgba(0,0,0,0.15) 0%,
+          rgba(0,0,0,0.15) 25%,
+          rgba(0,0,0,0) 25%,
+          rgba(0,0,0,0) 100%);
+      background-size: 100% 100%, 100% 100%;
+      mix-blend-mode: overlay;
+    } */
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+        background: linear-gradient(
+          180deg,
+          transparent 0%,
+          transparent 15%,
+          rgba(from var(--accent-color) r g b / 0.3) 25%,
+          black 60%
+        );
+      }
+
+      .blocker {
+        position: absolute;
+        bottom: -50px;
+        left: 0;
+        width: 100%;
+        height: 50%;
+        background: black;
+        z-index: -1;
+        box-shadow: 0px -10px 40px 20px black;
+      }
+    </style>
+  </body>
+</html>

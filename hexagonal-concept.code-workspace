@@ -1,0 +1,56 @@
+{
+  "folders": [
+    {
+      "name": "Hexagonal Concept",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "launch": {
+      "configurations": [],
+      "version": "0.2.0"
+    },
+    "cSpell.words": [],
+    "explorer.autoReveal": false,
+    "task.allowAutomaticTasks": "on",
+    "terminal.integrated.profiles.osx": {
+      "zsh": {
+        "args": [
+          "-l",
+          "-i"
+        ],
+        "path": "/bin/zsh"
+      }
+    },
+    "workbench.colorCustomizations": {
+      "activityBar.activeBackground": "#000",
+      "activityBar.activeBorder": "#43b08c",
+      "activityBar.background": "#000",
+      "activityBar.foreground": "#fff",
+      "activityBar.inactiveForeground": "#666",
+      "activityBarBadge.background": "#43b08c",
+      "activityBarBadge.foreground": "#000",
+      "sash.hoverBorder": "#43b08c",
+      "statusBar.background": "#000",
+      "statusBar.foreground": "#fff",
+      "statusBarItem.hoverBackground": "#43b08c",
+      "statusBarItem.remoteBackground": "#43b08c",
+      "statusBarItem.remoteForeground": "#000",
+      "titleBar.activeBackground": "#000",
+      "titleBar.activeForeground": "#43b08c",
+      "titleBar.inactiveBackground": "#000",
+      "titleBar.inactiveForeground": "#15202b99"
+    }
+  },
+  "tasks": {
+    "presentation": {
+      "echo": false,
+      "focus": false,
+      "panel": "dedicated",
+      "reveal": "always",
+      "showReuseMessage": true
+    },
+    "tasks": [],
+    "version": "2.0.0"
+  }
+}
